@@ -3,15 +3,15 @@ const mysql = require('mysql2');
 
 const db = mysql.createConnection(
     {
-      host: 'localhost',
-      // MySQL username,
-      user: 'root',
-      // MySQL password
-      password: 'Gandalf81643',
-      database: 'company_db'
+        host: 'localhost',
+        // MySQL username,
+        user: 'root',
+        // MySQL password
+        password: 'Gandalf81643',
+        database: 'company_db'
     },
     console.log(`Connected to the company_db database.`)
-  );
+);
 
 const questions = [
     {
@@ -26,24 +26,10 @@ const questions = [
             'update an employee role'],
         name: 'start'
     },
-    //if add dept:
-    
+
+
     //if add role:
-    {
-        type: 'input',
-        message: 'What is the name of the role?',
-        name: 'addRole',
-    },
-    {
-        type: 'input',
-        message: 'What is the salary for this role?',
-        name: 'addSalary',
-    },
-    // {
-    //     type: 'list',
-    // message: 'What department does this role belong to?',
-    // choices:[list existing departments],
-    // name: 'assignDept',}
+
 
     //if add employee:
     {
@@ -82,31 +68,83 @@ const questions = [
     //     choices: [roles],
     //     name: 'updateRole'
     // }
-
 ]
 
+
+//view data
 async function viewDepartments() {
     const results = await db.promise().query('SELECT * FROM department')
     console.table(results[0])
     console.log('\n')
+
     init()
 }
 
+async function viewRoles() {
+    const results = await db.promise().query('SELECT * FROM roles')
+    console.table(results[0])
+    console.log('\n')
+
+    init()
+}
+
+async function viewEmployees() {
+    const results = await db.promise().query('SELECT * FROM employees')
+    console.table(results[0])
+    console.log('\n')
+
+    init()
+}
+//add data
 async function addDept() {
     const questions = await inquirer.prompt([{
-        
-            type: 'input',
-            message: 'What is the name of the department?',
-            name: 'addDept',
-        
+
+        type: 'input',
+        message: 'What is the name of the department?',
+        name: 'addDept',
+
     }])
-    if (questions){
+    if (questions) {
         const results = db.promise().query('INSERT INTO department(dept_names) VALUES (?)', questions.addDept)
         console.table(results)
-        console.log ('dept added!')
+        console.log('Deptartment added!')
     }
     init()
 }
+
+// async function addRole() {
+
+//     // const roleChoices = async () => {
+//     //     const departments = await db.query('SELECT dept_names FROM department;');
+//     //     return departments[0];
+//     // };
+//     const questions = await inquirer.prompt([
+//         {
+
+//             type: 'input',
+//             message: 'What is the name of the role?',
+//             name: 'newRole',
+//         },
+//         {
+//             type: 'input',
+//             message: 'What is the salary for this role?',
+//             name: 'addSalary',
+//         },
+//         // {
+//         //     type: 'list',
+//         //     message: 'What department does this role belong to?',
+//         //     choices: SELECT dept_names FROM department,
+//         //     name: 'assignDept',
+//         // }
+
+//     ])
+//     if (questions) {
+//         const results = db.promise().query('INSERT INTO roles(title, salary, dept_id) VALUES (?)', questions.newRole, questions.addSalary, questions.assignDept)
+//         console.table(results)
+//         console.log('role added!')
+//     }
+//     init()
+// }
 
 function init() {
     inquirer.prompt([{
@@ -118,7 +156,8 @@ function init() {
             'add a department',
             'add a role',
             'add an employee',
-            'update an employee role'],
+            'update an employee role',
+            '],
         name: 'start'
     },])
         .then((response) => {
@@ -126,8 +165,21 @@ function init() {
             if (response.start === "view all departments") {
                 viewDepartments();
             }
-            if (response.start === "add a department"){
+
+            if(response.start === "view all roles"){
+                viewRoles();
+            }
+
+            if(response.start === "view all employees"){
+                viewEmployees();
+            }
+
+            if (response.start === "add a department") {
                 addDept();
+            }
+
+            if (response.start === "add a role") {
+                addRole();
             }
         });
 };
