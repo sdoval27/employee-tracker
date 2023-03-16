@@ -13,82 +13,8 @@ const db = mysql.createConnection(
     console.log(`Connected to the company_db database.`)
 );
 
-const questions = [
-    {
-        type: 'list',
-        message: 'What would you like to do?',
-        choices: ['view all departments',
-            'view all roles',
-            'view all employees',
-            'add a department',
-            'add a role',
-            'add an employee',
-            'update an employee role'],
-        name: 'start'
-    },
 
-
-    //if add role:
-    // {
-    //     type: 'list',
-    //     message: 'What department does this role belong to?',
-    //     choices: deptNamesArray,
-    //     name: 'assignDept',
-    // },
-    // {
-
-    //     type: 'input',
-    //     message: 'What is the name of the role?',
-    //     name: 'newRole',
-    // },
-    // {
-    //     type: 'input',
-    //     message: 'What is the salary for this role?',
-    //     name: 'addSalary',
-    // }
-
-
-    //if add employee:
-    {
-        type: 'input',
-        message: "What is the new Employee's first name?",
-        name: 'firstName',
-    },
-    {
-        type: 'input',
-        message: "What is the new Employee's last name?",
-        name: 'lastName',
-    },
-    //     {
-    //         type: 'list',
-    //         message: "What is this employee's role?",
-    //         choices: [list existing roles],
-    //         name: 'assignRole',
-    //     },
-    // {
-    //     type: 'list',
-    //     message: "Who is this employee's manager?",
-    //     choices: [list employee names],
-    //     name: 'assignManager',
-    // },
-
-    //if update employee role:
-    // {
-    //     type: 'list',
-    //     message: "Which employee's role do you want to update?",
-    //     choices: [list employees],
-    //     name: 'updateEmp'
-    // }
-    // {
-    //     type: 'list',
-    //     message: 'which role do you want to assign to the selected employee?',
-    //     choices: [roles],
-    //     name: 'updateRole'
-    // }
-]
-
-
-//view data
+//-----------------------------functions that display data-----------------------------------------------
 async function viewDepartments() {
     const results = await db.promise().query('SELECT * FROM department')
     console.table(results[0])
@@ -112,7 +38,7 @@ async function viewEmployees() {
 
     init()
 }
-//functions that add data
+//---------------------------------------functions that add data----------------------------------------
 async function addDept() {
     const questions = await inquirer.prompt([{
 
@@ -128,60 +54,6 @@ async function addDept() {
     }
     init()
 }
-
-// async function addRole() {
-//     const questions = await inquirer.prompt([
-//         //put questions here
-//         {
-//             type: 'input',
-//             message: 'What is the name of the role?',
-//             name: 'newRole',
-//         }])
-//         if (questions) {
-//             const results = await db.promise().query('INSERT INTO roles(title) VALUES (?)', questions.newRole)
-//             console.log(results)
-//             //console.log(deptNamesArray);
-//         }
-//         addRoleSalary()
-//     }
-
-// async function addRoleSalary(){
-//     const questions = await inquirer.prompt([
-//         //put questions here
-//         {
-//             type: 'input',
-//             message: 'What is the salary for this role?',
-//             name: 'addSalary',
-//         }])
-//     if (questions){
-//         const results = await db.promise().query('INSERT INTO roles(salary) VALUES (?)', questions.addSalary)
-//     }
-//     chooseDept()
-// }
-
-// async function chooseDept(){
-//     let deptNamesArray = [];
-//     const dept = await db.promise().query('SELECT dept_names FROM department');
-//     dept[0].ForEach(element => {
-//         deptNamesArray.pust(element.dept_names)
-//     });
-
-//     const questions = await inquirer.prompt([
-//         {
-//             type: 'list',
-//             message: 'What department does this role belong to?',
-//             choices: deptNamesArray,
-//             name: 'assignDept',
-//         }
-//     ])
-//     if (questions){
-//         const results = await db.promise.query('INSERT INTO roles(dept_id) VALUES (?)', questions.assignDept)
-//         console.log(results)
-//             //console.log(deptNamesArray);
-//             console.log('A new role has been added!')
-//     }
-//     init();
-// }
 
 async function addRole() {
     // //create array of dept name for users to select in inquirer CURRENTLY RETURNS UNDEFINED
@@ -216,22 +88,15 @@ async function addRole() {
     init()
 }
 
-
-
 async function addEmployee() {
     //create array of roles for users to select in inquirer
 
     const roles = await db.promise().query("SELECT * FROM roles;")
     const roleNamesArray = roles[0].map(({ id, title }) => ({ name: title, value: id }))
+
     //create array of employees for users to select in inquirer
     const emp = await db.promise().query("SELECT * FROM employees;")
     const employeeNamesArray = emp[0].map(({ id, first_name, last_name }) => ({ name: (first_name, last_name), value: id }))
-    
-    // let employeeNamesArray = [];
-    // const emp = await db.promise().query('SELECT (id) FROM employees');
-    // emp[0].forEach(element => {
-    //     employeeNamesArray.push(element.id)
-    // });
 
     const questions = await inquirer.prompt([
         //put questions here
@@ -270,13 +135,13 @@ async function addEmployee() {
     init()
 }
 
-//update function
+//------------------------------ function that updates data -------------------------------------------------------------
 async function updateRole() {
     //employee list
     const emp = await db.promise().query("SELECT * FROM employees;")
     const employeeNamesArray = emp[0].map(({id, first_name, last_name }) => ({ name: (first_name, last_name), value: id }))
 
-    //create array of roles for users to select in inquirer
+    //roles list
     const roles = await db.promise().query("SELECT * FROM roles;")
     const roleNamesArray = roles[0].map(({ id, title }) => ({ name: title, value: id }))
 
