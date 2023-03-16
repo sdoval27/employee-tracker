@@ -122,8 +122,8 @@ async function addDept() {
 
     }])
     if (questions) {
-        const results = db.promise().query('INSERT INTO department(dept_names) VALUES (?)', questions.addDept)
-        console.table(results[0])
+        const results = await db.promise().query('INSERT INTO department(dept_names) VALUES (?)', questions.addDept)
+        console.log(results)
         console.log('Deptartment added!')
     }
     init()
@@ -133,9 +133,13 @@ async function addDept() {
 async function addRole() {
     //create array of dept name for users to select in inquirer CURRENTLY RETURNS UNDEFINED
     let deptNamesArray = [];
+
     //supposedly pushes dept names into array
     const dept = await db.promise().query('SELECT dept_names FROM department');
-    deptNamesArray.push(dept[0]);
+    dept[0].forEach(element => {
+        deptNamesArray.push(element.dept_names)
+    });
+    // deptNamesArray = dept[0];
 
     const questions = await inquirer.prompt([
         //put questions here
@@ -160,7 +164,7 @@ async function addRole() {
     if (questions) {
         const results = db.promise().query('INSERT INTO roles(title, salary, dept_id) VALUES (?)', questions.newRole, questions.addSalary, questions.addDept)
         console.table(results)
-        
+
         console.log(deptNamesArray);
     }
     init()
@@ -207,13 +211,35 @@ async function addEmployee() {
     if (questions) {
         const results = db.promise().query('INSERT INTO employees(first_name, last_name,) VALUES (?)', questions.firstname, questions.lastname)
         console.table(results[0])
-        
+
         console.log(deptNamesArray);
     }
     init()
 }
 
-async function updateRole()
+//update function
+async function updateRole() {
+    const questions = await inquirer.prompt([
+        {
+            type: 'list',
+            message: "Which employee's role do you want to update?",
+            //choices: [list employees],
+            name: 'updateEmp'
+        },
+            {
+            type: 'list',
+            message: 'which role do you want to assign to the selected employee?',
+            //choices: [list roles],
+            name: 'updateRole'
+        }
+    ])
+    if (questions) {
+        // const results = db.promise().query('INSERT INTO department(dept_names) VALUES (?)', questions.addDept)
+        // console.table(results[0])
+        // console.log('Deptartment added!')
+    }
+    init()
+}
 
 
 function init() {
