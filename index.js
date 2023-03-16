@@ -129,18 +129,64 @@ async function addDept() {
     init()
 }
 
-//HEY SASH IT'S ME SASH HERE'S THE PROBLEM CHILD I SAVED FOR YOU PLEASE FIX IT LOVE YOU BYEEE
+// async function addRole() {
+//     const questions = await inquirer.prompt([
+//         //put questions here
+//         {
+//             type: 'input',
+//             message: 'What is the name of the role?',
+//             name: 'newRole',
+//         }])
+//         if (questions) {
+//             const results = await db.promise().query('INSERT INTO roles(title) VALUES (?)', questions.newRole)
+//             console.log(results)
+//             //console.log(deptNamesArray);
+//         }
+//         addRoleSalary()
+//     }
+
+// async function addRoleSalary(){
+//     const questions = await inquirer.prompt([
+//         //put questions here
+//         {
+//             type: 'input',
+//             message: 'What is the salary for this role?',
+//             name: 'addSalary',
+//         }])
+//     if (questions){
+//         const results = await db.promise().query('INSERT INTO roles(salary) VALUES (?)', questions.addSalary)
+//     }
+//     chooseDept()
+// }
+
+// async function chooseDept(){
+//     let deptNamesArray = [];
+//     const dept = await db.promise().query('SELECT dept_names FROM department');
+//     dept[0].ForEach(element => {
+//         deptNamesArray.pust(element.dept_names)
+//     });
+
+//     const questions = await inquirer.prompt([
+//         {
+//             type: 'list',
+//             message: 'What department does this role belong to?',
+//             choices: deptNamesArray,
+//             name: 'assignDept',
+//         }
+//     ])
+//     if (questions){
+//         const results = await db.promise.query('INSERT INTO roles(dept_id) VALUES (?)', questions.assignDept)
+//         console.log(results)
+//             //console.log(deptNamesArray);
+//             console.log('A new role has been added!')
+//     }
+//     init();
+// }
+
 async function addRole() {
-    //create array of dept name for users to select in inquirer CURRENTLY RETURNS UNDEFINED
-    let deptNamesArray = [];
-
-    //supposedly pushes dept names into array
-    const dept = await db.promise().query('SELECT dept_names FROM department');
-    dept[0].forEach(element => {
-        deptNamesArray.push(element.dept_names)
-    });
-    // deptNamesArray = dept[0];
-
+    // //create array of dept name for users to select in inquirer CURRENTLY RETURNS UNDEFINED
+    const depts = await db.promise().query("SELECT * FROM department;")
+    const deptNamesArray = depts[0].map(({ id, dept_names }) => ({ name: dept_names, value: id }))
     const questions = await inquirer.prompt([
         //put questions here
         {
@@ -162,24 +208,35 @@ async function addRole() {
     ])
 
     if (questions) {
-        const results = db.promise().query('INSERT INTO roles(title, salary, dept_id) VALUES (?)', questions.newRole, questions.addSalary, questions.addDept)
-        console.table(results)
-
-        console.log(deptNamesArray);
+        const results = await db.promise().query(`INSERT INTO roles (title, salary, dept_id) VALUES ("${questions.newRole}", ${questions.addSalary}, ${questions.assignDept});`)
+        console.log(results)
+        //console.log(deptNamesArray);
+        console.log('A new role has been added!', results)
     }
     init()
 }
 
-async function addEmployee() {
-    //create array of dept name for users to select in inquirer CURRENTLY RETURNS UNDEFINED
-    let roleNamesArray = [];
-    let employeeNamesArray = [];
-    //supposedly pushes roles and names into respective arrays
-    const roles = await db.promise().query('SELECT title FROM roles');
-    const names = await db.promise().query('SELECT (first_name, last_name) FROM employees');
 
-    roleNamesArray.push(roles[0]);
-    employeeNamesArray.push(names[0]);
+
+async function addEmployee() {
+    // //create array of dept name for users to select in inquirer CURRENTLY RETURNS UNDEFINED
+    // let roleNamesArray = [];
+    // //supposedly pushes roles and names into respective arrays
+    // const role = await db.promise().query('SELECT title FROM roles');
+    // role[0].forEach(element => {
+    //     roleNamesArray.push(element.title)
+    // });
+    const roles = await db.promise().query("SELECT * FROM roles;")
+    const roleNamesArray = roles[0].map(({ id, title }) => ({ name: title, value: id }))
+
+    const emp = await db.promise().query("SELECT * FROM employees;")
+    const employeeNamesArray = emp[0].map(({ id, first_name, last_name }) => ({ name: (first_name, last_name), value: id }))
+    
+    // let employeeNamesArray = [];
+    // const emp = await db.promise().query('SELECT (id) FROM employees');
+    // emp[0].forEach(element => {
+    //     employeeNamesArray.push(element.id)
+    // });
 
     const questions = await inquirer.prompt([
         //put questions here
@@ -194,25 +251,26 @@ async function addEmployee() {
             name: 'lastName',
         },
 
-        //     {
-        //         type: 'list',
-        //         message: "What is this employee's role?",
-        //         choices: [list existing roles],
-        //         name: 'assignRole',
-        //     },
-        // {
-        //     type: 'list',
-        //     message: "Who is this employee's manager?",
-        //     choices: [list employee names],
-        //     name: 'assignManager',
-        // }
+        {
+            type: 'list',
+            message: "What is this employee's role?",
+            choices: roleNamesArray,
+            name: 'assignRole',
+        },
+        {
+            type: 'list',
+            message: "Who is this employee's manager?",
+            choices: employeeNamesArray,
+            name: 'assignManager',
+        }
     ])
 
     if (questions) {
-        const results = db.promise().query('INSERT INTO employees(first_name, last_name,) VALUES (?)', questions.firstname, questions.lastname)
-        console.table(results[0])
+        const results = await db.promise().query(`INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES (${questions.firstName}, ${questions.lastName}, ${questions.assignRole}, ${questions.assignManager});`);
+        console.log(results[0])
 
-        console.log(deptNamesArray);
+        console.log(roleNamesArray);
+        console.log(employeeNamesArray);
     }
     init()
 }
@@ -226,7 +284,7 @@ async function updateRole() {
             //choices: [list employees],
             name: 'updateEmp'
         },
-            {
+        {
             type: 'list',
             message: 'which role do you want to assign to the selected employee?',
             //choices: [list roles],
@@ -237,7 +295,7 @@ async function updateRole() {
         // const results = db.promise().query('INSERT INTO department(dept_names) VALUES (?)', questions.addDept)
         // console.table(results[0])
         // console.log('Deptartment added!')
-    }
+    };
     init()
 }
 
