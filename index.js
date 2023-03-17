@@ -82,8 +82,7 @@ async function addRole() {
     if (questions) {
         const results = await db.promise().query(`INSERT INTO roles (title, salary, dept_id) VALUES ("${questions.newRole}", ${questions.addSalary}, ${questions.assignDept});`)
         console.log(results)
-        //console.log(deptNamesArray);
-        console.log('A new role has been added!', results)
+        console.log('A new role has been added!')
     }
     init()
 }
@@ -96,7 +95,7 @@ async function addEmployee() {
 
     //create array of employees for users to select in inquirer
     const emp = await db.promise().query("SELECT * FROM employees;")
-    const employeeNamesArray = emp[0].map(({ id, first_name, last_name }) => ({ name: (first_name, last_name), value: id }))
+    const employeeNamesArray = emp[0].map(({ id, first_name, last_name}) => ({ name: first_name, last_name, value: id }))
 
     const questions = await inquirer.prompt([
         //put questions here
@@ -126,11 +125,12 @@ async function addEmployee() {
     ])
 
     if (questions) {
-        const results = await db.promise().query(`INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES (${questions.firstName}, ${questions.lastName}, ${questions.assignRole}, ${questions.assignManager});`);
+        const results = await db.promise().query(`INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES ('${questions.firstName}', '${questions.lastName}', '${questions.assignRole}', '${questions.assignManager}');`);
         console.log(results[0])
 
-        console.log(roleNamesArray);
-        console.log(employeeNamesArray);
+       //console.log(roleNamesArray);
+       // console.log(employeeNamesArray);
+        console.log('employee added!')
     }
     init()
 }
