@@ -30,4 +30,4 @@
 
 ## Questions:
  - Visit my github at: [sdoval27](https://github.com/sdoval27)
- - Reference [this walkthrough]() that demonstrates this app's functionality.
+ - Reference [this walkthrough](https://drive.google.com/file/d/1tuC0s5p0713891Y-yceg5R22aAzS0CEC/view?usp=sharing) that demonstrates this app's functionality.
